@@ -1,0 +1,32 @@
+.TaskApp {
+  margin: 0;
+  padding: 20px;
+  border: solid 1px #ccc;
+}
+
+.header {
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.body table {
+  padding: 16px;
+  width: 100%;
+}
+
+.body table th {
+  cursor: pointer;
+}
+
+.body table th, td {
+  padding: 8px;
+}
+
+.body table thead {
+  background-color: #eee;
+}
+
+.footer {
+  margin-top: 32px;
+  text-align: center;
+}

@@ -1,0 +1,31 @@
+.tasklist {
+  padding: 10px;
+  border: solid 1px #ccc;
+}
+
+.body table {
+  width: 100%;
+  padding: 16px;
+}
+
+.body table th {
+  cursor: pointer;
+}
+
+.body table th, td {
+  padding: 8px;
+}
+
+.body table thead {
+  background-color: #eee;
+}
+
+.body table td.edit {
+  padding: 0;
+}
+
+.footer {
+  margin-top: 32px;
+  margin-bottom: 16px;
+  text-align: center;
+}
