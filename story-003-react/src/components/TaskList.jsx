@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import TaskEdit from './TaskEdit';
-import { getStatusLabel, getPriorityLabel } from '../helpers/labels';
+import { getStatusLabel, getPriorityLabel, STATUS_VALUES, PRIORITY_VALUES } from '../helpers/labels';
 
 import './TaskList.css';
 
@@ -93,16 +93,11 @@ export default function TaskList({ tasks, onUpdate, onDelete, onSort, onFilter }
       <div className="footer">
         <select value={priorityFilter} onChange={(e) => handlePriorityFilter(e.target.value)}>
           <option value="-1">All Priorities</option>
-          <option value="0">Low</option>
-          <option value="1">Normal</option>
-          <option value="2">High</option>
-          <option value="3">Urgent</option>
+          {PRIORITY_VALUES.map(v => <option value={v.value}>{v.label}</option>)}
         </select>
         <select value={statusFilter} onChange={(e) => handleStatusFilter(e.target.value)}>
           <option value="-1">All Statuses</option>
-          <option value="0">Todo</option>
-          <option value="1">Doing</option>
-          <option value="2">Done</option>
+          {STATUS_VALUES.map(v => <option value={v.value}>{v.label}</option>)}
         </select>
       </div>
     </div>
