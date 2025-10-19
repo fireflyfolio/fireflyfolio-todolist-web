@@ -1,74 +1,89 @@
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import TaskCreate from './TaskCreate';
 import TaskList from './TaskList';
 
 import './TaskApp.css';
 
-let allTasks = [];
-
 export default function TaskApp() {
-  const [nextId, setNextId] = useState(0);
+  const allTasksRef = useRef([]);
+  const nextIdRef = useRef(0);
+
   const [tasks, setTasks] = useState([]);
 
-  function refreshAllTasks(t) {
-    allTasks = [...t];
-  }
+  const refreshFromAll = useCallback(() => {
+    setTasks([...allTasksRef.current]);
+  }, []);
 
-  function handleCreateTask(task) {
-    const _tasks = [...tasks, task];
-    setTasks(_tasks);
-    setNextId(nextId + 1);
-    refreshAllTasks(_tasks);
-  }
+  const handleCreateTask = useCallback((partialTask) => {
+    const task = {
+      id: nextIdRef.current++,
+      name: partialTask.name?.trim() ?? '',
+      priority: Number(partialTask.priority ?? 0),
+      status: Number(partialTask.status ?? 0),
+    };
 
-  function handleUpdateTask(task) {
-    allTasks = allTasks.map(t => {
-      if (t.id === task.id) {
-        return task;
-      } else {
-        return t;
-      }
-    });
+    allTasksRef.current = [...allTasksRef.current, task];
+    setTasks((prev) => [...prev, task]);
+  }, []);
 
-    const _tasks = tasks.map(t => {
-      if (t.id === task.id) {
-        return task;
-      } else {
-        return t;
-      }
-    });
+  const handleUpdateTask = useCallback((updated) => {
+    const u = {
+      ...updated,
+      name: updated.name?.trim() ?? '',
+      priority: Number(updated.priority ?? 0),
+      status: Number(updated.status ?? 0),
+    };
 
-    setTasks(_tasks);
-  }
+    allTasksRef.current = allTasksRef.current.map(t => (t.id === u.id ? u : t));
+    setTasks(prev => prev.map(t => (t.id === u.id ? u : t)));
+  }, []);
 
-  function handleDeleteTask(id) {
-    const _tasks = [...tasks.filter(t => t.id !== id)];
-    setTasks(_tasks);
-    refreshAllTasks(_tasks);
-  }
+  const handleDeleteTask = useCallback((id) => {
+    allTasksRef.current = allTasksRef.current.filter(t => t.id !== id);
+    setTasks(prev => prev.filter(t => t.id !== id));
+  }, []);
 
-  function handleSort(tasks) {
-    setTasks(tasks);
-  }
+  const handleSort = useCallback((sortedTasks) => {
+    const ids = new Set(sortedTasks.map(t => t.id));
+    const sortedMap = new Map(sortedTasks.map(t => [t.id, t]));
+    allTasksRef.current = allTasksRef.current
+      .filter(t => ids.has(t.id))
+      .map(t => sortedMap.get(t.id));
+    setTasks(sortedTasks);
+  }, []);
 
-  function handleFilter(priority = -1, status = -1) {
-    if (priority > -1 && status > -1) {
-      setTasks([...allTasks.filter(t => t.priority === priority && t.status === status)]);
-    } else if (priority > -1) {
-      setTasks([...allTasks.filter(t => t.priority === priority)]);
-    } else if (status > -1) {
-      setTasks([...allTasks.filter(t => t.status === status)]);
+  const handleFilter = useCallback((priority = -1, status = -1) => {
+    const p = Number(priority);
+    const s = Number(status);
+
+    let base = allTasksRef.current;
+    if (p > -1 && s > -1) {
+      setTasks(base.filter(t => t.priority === p && t.status === s));
+    } else if (p > -1) {
+      setTasks(base.filter(t => t.priority === p));
+    } else if (s > -1) {
+      setTasks(base.filter(t => t.status === s));
     } else {
-      setTasks([...allTasks]);
+      setTasks([...base]);
     }
-  }
+  }, []);
 
-  return (
+ const handleResetView = useCallback(() => {
+    refreshFromAll();
+  }, [refreshFromAll]);
+
+ return (
     <div className="TaskApp">
-      <TaskCreate nextId={nextId} onCreate={handleCreateTask} />
-      <TaskList tasks={tasks} onUpdate={handleUpdateTask} onDelete={handleDeleteTask}
-        onSort={handleSort} onFilter={handleFilter} />
+      <TaskCreate nextId={nextIdRef.current} onCreate={handleCreateTask} />
+      <TaskList
+        tasks={tasks}
+        onUpdate={handleUpdateTask}
+        onDelete={handleDeleteTask}
+        onSort={handleSort}
+        onFilter={handleFilter}
+        onResetView={handleResetView}
+      />
     </div>
   );
 }
