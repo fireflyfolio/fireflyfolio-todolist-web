@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 
-import { getStatusLabel, getPriorityLabel } from '../helpers/labels';
+import { getStatusLabel, getPriorityLabel, STATUS_VALUES, PRIORITY_VALUES } from '../helpers/labels';
 import './TaskApp.css';
 
 let nextId = 0;
@@ -109,15 +109,10 @@ export default function TaskApp() {
         <input placeholder="Enter a task" ref={inputRef} value={task.name} onKeyDown={handleKeyDown}
           onChange={e => setTask({...task, name: e.target.value})} autoFocus />
         <select value={task.priority} onChange={e => setTask({...task, priority: parseInt(e.target.value)})}>
-          <option value="0">Low</option>
-          <option value="1">Normal</option>
-          <option value="2">High</option>
-          <option value="3">Urgent</option>
+          {STATUS_VALUES.map(v => <option value={v.value}>{v.label}</option>)}
         </select>
         <select value={task.status} onChange={e => setTask({...task, status: parseInt(e.target.value)})}>
-          <option value="0">Todo</option>
-          <option value="1">Doing</option>
-          <option value="2">Done</option>
+          {PRIORITY_VALUES.map(v => <option value={v.value}>{v.label}</option>)}
         </select>
         <button onClick={handleUpdateClick}>{task.id === null ? 'Create' : 'Update'}</button>
       </div>
@@ -150,16 +145,11 @@ export default function TaskApp() {
       <div className="footer">
         <select value={priorityFilter} onChange={(e) => handlePriorityFilter(e.target.value)}>
           <option value="-1">All Priorities</option>
-          <option value="0">Low</option>
-          <option value="1">Normal</option>
-          <option value="2">High</option>
-          <option value="3">Urgent</option>
+          {PRIORITY_VALUES.map(v => <option value={v.value}>{v.label}</option>)}
         </select>
         <select value={statusFilter} onChange={(e) => handleStatusFilter(e.target.value)}>
           <option value="-1">All Statuses</option>
-          <option value="0">Todo</option>
-          <option value="1">Doing</option>
-          <option value="2">Done</option>
+          {STATUS_VALUES.map(v => <option value={v.value}>{v.label}</option>)}
         </select>
       </div>
     </div>
