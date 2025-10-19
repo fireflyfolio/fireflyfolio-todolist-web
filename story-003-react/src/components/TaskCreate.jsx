@@ -1,4 +1,6 @@
 import { useRef, useState } from 'react';
+import { STATUS_VALUES, PRIORITY_VALUES } from '../helpers/labels';
+
 import './TaskCreate.css';
 
 export default function TaskCreate({ nextId, onCreate }) {
@@ -42,18 +44,13 @@ export default function TaskCreate({ nextId, onCreate }) {
         value={task.priority}
         onChange={e => setTask({ ...task, priority: Number(e.target.value) })}
       >
-        <option value={0}>Low</option>
-        <option value={1}>Normal</option>
-        <option value={2}>High</option>
-        <option value={3}>Urgent</option>
+        {PRIORITY_VALUES.map(v => <option value={v.value}>{v.label}</option>)}
       </select>
       <select
         value={task.status}
         onChange={e => setTask({ ...task, status: Number(e.target.value) })}
       >
-        <option value={0}>Todo</option>
-        <option value={1}>Doing</option>
-        <option value={2}>Done</option>
+        {STATUS_VALUES.map(v => <option value={v.value}>{v.label}</option>)}
       </select>
       <button type="submit" disabled={!task.name.trim()}>Create</button>
     </form>

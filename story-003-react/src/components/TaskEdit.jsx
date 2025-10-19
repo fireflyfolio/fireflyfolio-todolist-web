@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { STATUS_VALUES, PRIORITY_VALUES } from '../helpers/labels';
 
 import './TaskEdit.css';
 
@@ -24,15 +25,10 @@ export default function TaskEdit({ tasks, id, onUpdate, onCancel }) {
       <input placeholder="Enter a task" value={task.name} onKeyDown={handleKeyDown}
         onChange={e => setTask({...task, name: e.target.value})} autoFocus />
       <select value={task.priority} onChange={e => setTask({...task, priority: parseInt(e.target.value)})}>
-        <option value="0">Low</option>
-        <option value="1">Normal</option>
-        <option value="2">High</option>
-        <option value="3">Urgent</option>
+        {PRIORITY_VALUES.map(v => <option value={v.value}>{v.label}</option>)}
       </select>
       <select value={task.status} onChange={e => setTask({...task, status: parseInt(e.target.value)})}>
-        <option value="0">Todo</option>
-        <option value="1">Doing</option>
-        <option value="2">Done</option>
+        {STATUS_VALUES.map(v => <option value={v.value}>{v.label}</option>)}
       </select>
       <button onClick={handleUpdateClick}>Update</button>
       <button onClick={onCancel}>Cancel</button>
