@@ -65,7 +65,7 @@ export default function TaskApp() {
   }
 
   return (
-    <div className="taskapp">
+    <div className="TaskApp">
       <TaskCreate nextId={nextId} onCreate={handleCreateTask} />
       <TaskList tasks={tasks} onUpdate={handleUpdateTask} onDelete={handleDeleteTask}
         onSort={handleSort} onFilter={handleFilter} />

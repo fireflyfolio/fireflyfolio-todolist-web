@@ -32,7 +32,7 @@ export default function TaskCreate({ nextId, onCreate }) {
   }
 
   return (
-    <form className="taskcreate" onSubmit={handleSubmit}>
+    <form className="TaskCreate" onSubmit={handleSubmit}>
       <input
         placeholder="Enter a task"
         value={task.name}

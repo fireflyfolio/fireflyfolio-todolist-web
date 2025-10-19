@@ -21,7 +21,7 @@ export default function TaskEdit({ tasks, id, onUpdate, onCancel }) {
   }
 
   return (
-    <div className="taskedit">
+    <div className="TaskEdit">
       <input placeholder="Enter a task" value={task.name} onKeyDown={handleKeyDown}
         onChange={e => setTask({...task, name: e.target.value})} autoFocus />
       <select value={task.priority} onChange={e => setTask({...task, priority: parseInt(e.target.value)})}>

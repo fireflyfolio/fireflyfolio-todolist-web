@@ -57,7 +57,7 @@ export default function TaskList({ tasks, onUpdate, onDelete, onSort, onFilter }
   }
 
   return (
-    <div className="tasklist">
+    <div className="TaskList">
       <div className="body">
         <table>
           <thead>
