@@ -1,4 +1,4 @@
-# 🦋 Itération 005 — Migration vers TypeScript
+# 🦋 Itération 004 — Migration vers TypeScript
 
 Cette itération marque la transition complète du projet **FireflyFolio TodoList Web** de **JavaScript** vers **TypeScript**.
 
