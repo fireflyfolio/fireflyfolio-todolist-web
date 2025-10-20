@@ -1,33 +1,39 @@
 import { useRef, useState } from 'react';
 import { STATUS_VALUES, PRIORITY_VALUES } from '../helpers/labels';
+import type { TaskCreateProps, Priority, Status } from '../types/types';
 
 import './TaskCreate.css';
 
-export default function TaskCreate({ nextId, onCreate }) {
-  const [task, setTask] = useState({ id: null, name: '', priority: 0, status: 0 });
-  const lastSelRef = useRef({ priority: 0, status: 0 });
+type DraftTask = { name: string; priority: Priority, status: Status };
+
+export default function TaskCreate({ nextId, onCreate }: TaskCreateProps) {
+  const [task, setTask] = useState<DraftTask>({
+    name: '',
+    priority: 0 as Priority,
+    status: 0 as Status,
+  });
+
+  const lastSelRef = useRef<{priority: Priority, status: Status}>({
+    priority: 0 as Priority,
+    status: 0 as Status,
+  });
 
   function resetTask() {
-    setTask({ id: null, name: '', ...lastSelRef.current });
+    setTask({ name: '', ...lastSelRef.current });
   }
 
-  function handleSubmit(e) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement> | React.KeyboardEvent<HTMLInputElement>) {
     e.preventDefault();
     const name = task.name.trim();
     if (!name) return;
 
     onCreate({
-      id: nextId,
       name,
-      priority: Number(task.priority),
-      status: Number(task.status),
+      priority: task.priority,
+      status: task.status,
     });
 
-    lastSelRef.current = {
-      priority: Number(task.priority),
-      status: Number(task.status),
-    };
-
+    lastSelRef.current = { priority: task.priority, status: task.status };
     resetTask();
   }
 
@@ -42,13 +48,13 @@ export default function TaskCreate({ nextId, onCreate }) {
       />
       <select
         value={task.priority}
-        onChange={e => setTask({ ...task, priority: Number(e.target.value) })}
+        onChange={e => setTask({ ...task, priority: Number(e.target.value) as Priority })}
       >
         {PRIORITY_VALUES.map(v => <option value={v.value}>{v.label}</option>)}
       </select>
       <select
         value={task.status}
-        onChange={e => setTask({ ...task, status: Number(e.target.value) })}
+        onChange={e => setTask({ ...task, status: Number(e.target.value) as Status })}
       >
         {STATUS_VALUES.map(v => <option value={v.value}>{v.label}</option>)}
       </select>

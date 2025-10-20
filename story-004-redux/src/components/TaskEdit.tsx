@@ -1,24 +1,42 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+
 import { STATUS_VALUES, PRIORITY_VALUES } from '../helpers/labels';
+import type { TaskEditProps, Task, Priority, Status } from '../types/types';
 
 import './TaskEdit.css';
 
-export default function TaskEdit({ tasks, id, onUpdate, onCancel }) {
-  // Récupérer la source depuis les props, mémoisée
-  const sourceTask = useMemo(() => tasks.find(t => t.id === id) ?? null, [tasks, id]);
+type DraftTask = { name: string; priority: Priority, status: Status };
 
-  // Etat local (draft) qui se resynchronise quand la source change
-  const [draft, setDraft] = useState(
-    sourceTask ?? { id: null, name: '', priority: 0, status: 0 }
+export default function TaskEdit({ tasks, id, onUpdate, onCancel }: TaskEditProps) {
+  const sourceTask = useMemo<Task | null>(
+    () => tasks.find(t => t.id === id) ?? null,
+    [tasks, id]
   );
 
+  const [draft, setDraft] = useState<DraftTask>({
+    name: '',
+    priority: 0 as Priority,
+    status: 0 as Status,
+  });
+
   useEffect(() => {
-    setDraft(sourceTask ?? { id: null, name: '', priority: 0, status: 0 });
+    if (sourceTask) {
+      setDraft({
+        name: sourceTask.name,
+        priority: sourceTask.priority,
+        status: sourceTask.status,
+      });
+    } else {
+      setDraft({
+        name: '',
+        priority: 0 as Priority,
+        status: 0 as Status,
+      });
+    }
   }, [sourceTask]);
 
-  const inputRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  // Garde-fou si la tâche n’existe plus
   if (!sourceTask) {
     return (
       <div className="TaskEdit">
@@ -28,21 +46,22 @@ export default function TaskEdit({ tasks, id, onUpdate, onCancel }) {
     );
   }
 
-  // Détection de changement pour activer/désactiver le bouton Update
   const changed =
     draft.name.trim() !== sourceTask.name ||
-    Number(draft.priority) !== sourceTask.priority ||
-    Number(draft.status) !== sourceTask.status;
+    draft.priority !== sourceTask.priority ||
+    draft.status !== sourceTask.status;
 
-  function handleSubmit(e) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement> | React.KeyboardEvent<HTMLInputElement>) {
     e.preventDefault();
+
     const name = draft.name.trim();
     if (!name || !changed) return;
+
     onUpdate({
-      id: sourceTask.id,
+      id: id,
       name,
-      priority: Number(draft.priority),
-      status: Number(draft.status),
+      priority: draft.priority,
+      status: draft.status
     });
   }
 
@@ -65,7 +84,7 @@ export default function TaskEdit({ tasks, id, onUpdate, onCancel }) {
 
       <select
         value={draft.priority}
-        onChange={(e) => setDraft({ ...draft, priority: Number(e.target.value) })}
+        onChange={(e) => setDraft({ ...draft, priority: Number(e.target.value) as Priority })}
         aria-label="Priority"
       >
         {PRIORITY_VALUES.map(v => <option value={v.value}>{v.label}</option>)}
@@ -73,12 +92,12 @@ export default function TaskEdit({ tasks, id, onUpdate, onCancel }) {
 
       <select
         value={draft.status}
-        onChange={(e) => setDraft({ ...draft, status: Number(e.target.value) })}
+        onChange={(e) => setDraft({ ...draft, status: Number(e.target.value) as Status })}
         aria-label="Status"
       >
         {STATUS_VALUES.map(v => <option value={v.value}>{v.label}</option>)}
       </select>
-      
+
       <button type="submit" disabled={!draft.name.trim() || !changed}>Update</button>
       <button type="button" onClick={onCancel}>Cancel</button>
     </form>

@@ -3,61 +3,69 @@ import { useCallback, useRef, useState } from 'react';
 import TaskCreate from './TaskCreate';
 import TaskList from './TaskList';
 
+import {
+  Task,
+  PartialTaskInput,
+  PriorityFilter,
+  StatusFilter,
+} from '../types/types';
+
 import './TaskApp.css';
 
 export default function TaskApp() {
-  const allTasksRef = useRef([]);
-  const nextIdRef = useRef(0);
+  const allTasksRef = useRef<Task[]>([]);
+  const nextIdRef = useRef<number>(0);
 
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
 
   const refreshFromAll = useCallback(() => {
     setTasks([...allTasksRef.current]);
   }, []);
 
-  const handleCreateTask = useCallback((partialTask) => {
+  const handleCreateTask = useCallback((partialTask: PartialTaskInput) => {
     const task = {
       id: nextIdRef.current++,
       name: partialTask.name?.trim() ?? '',
-      priority: Number(partialTask.priority ?? 0),
-      status: Number(partialTask.status ?? 0),
+      priority: Number(partialTask.priority ?? 0) as Task['priority'],
+      status: Number(partialTask.status ?? 0) as Task['status'],
     };
 
     allTasksRef.current = [...allTasksRef.current, task];
-    setTasks((prev) => [...prev, task]);
+    setTasks(prev => [...prev, task]);
   }, []);
 
-  const handleUpdateTask = useCallback((updated) => {
+  const handleUpdateTask = useCallback((updated: Task) => {
     const u = {
       ...updated,
       name: updated.name?.trim() ?? '',
-      priority: Number(updated.priority ?? 0),
-      status: Number(updated.status ?? 0),
+      priority: Number(updated.priority ?? 0) as Task['priority'],
+      status: Number(updated.status ?? 0) as Task['status'],
     };
 
     allTasksRef.current = allTasksRef.current.map(t => (t.id === u.id ? u : t));
     setTasks(prev => prev.map(t => (t.id === u.id ? u : t)));
   }, []);
 
-  const handleDeleteTask = useCallback((id) => {
+  const handleDeleteTask = useCallback((id: number) => {
     allTasksRef.current = allTasksRef.current.filter(t => t.id !== id);
     setTasks(prev => prev.filter(t => t.id !== id));
   }, []);
 
-  const handleSort = useCallback((sortedTasks) => {
+  const handleSort = useCallback((sortedTasks: Task[]) => {
     const ids = new Set(sortedTasks.map(t => t.id));
     const sortedMap = new Map(sortedTasks.map(t => [t.id, t]));
     allTasksRef.current = allTasksRef.current
       .filter(t => ids.has(t.id))
-      .map(t => sortedMap.get(t.id));
+      .map(t => sortedMap.get(t.id)!);
     setTasks(sortedTasks);
   }, []);
 
-  const handleFilter = useCallback((priority = -1, status = -1) => {
-    const p = Number(priority);
-    const s = Number(status);
+  const handleFilter = useCallback((priority: PriorityFilter = -1, status: StatusFilter = -1) => {
+    const p = Number(priority) as PriorityFilter;
+    const s = Number(status) as StatusFilter;
 
     let base = allTasksRef.current;
+
     if (p > -1 && s > -1) {
       setTasks(base.filter(t => t.priority === p && t.status === s));
     } else if (p > -1) {

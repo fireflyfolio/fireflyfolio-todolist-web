@@ -1,5 +1,4 @@
-export type Status = 0 | 1 | 2;
-export type Priority = 0 | 1 | 2 | 3;
+import { Status, Priority } from '../types/types';
 
 export const STATUS_LABELS: Record<Status, string> = {
   0: 'Todo',
