@@ -1,6 +1,6 @@
 import TaskApp from './components/TaskApp';
 
-import './App.css'
+import './App.css';
 
 function App() {
   return (
