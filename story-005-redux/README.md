@@ -3,6 +3,10 @@
 Cette itération introduit **Redux Toolkit** pour centraliser la logique d’état de l’application TodoList.
 L’objectif était de remplacer le `useState` local par un store global robuste, tout en conservant le comportement initial (création, édition, suppression, tri, filtrage, annulation).
 
+<p align="center">
+  <img src="./public/screenshot.png" alt="Aperçu de la TodoList (Itération 005)" width="600" />
+</p>
+
 ## 🎯 Objectif
 
 - Simplifier la gestion de l’état global.
