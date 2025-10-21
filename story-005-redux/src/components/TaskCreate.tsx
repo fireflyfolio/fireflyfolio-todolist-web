@@ -1,64 +1,49 @@
 import { useRef, useState } from 'react';
-import { STATUS_VALUES, PRIORITY_VALUES } from '../helpers/labels';
-import type { TaskCreateProps, Priority, Status } from '../types/types';
-
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { createTask } from '../features/tasks/tasksSlice';
+import type { Priority, Status } from '../types/types';
+import { PRIORITY_VALUES, STATUS_VALUES } from '../helpers/labels';
 import './TaskCreate.css';
 
-type DraftTask = { name: string; priority: Priority, status: Status };
+export default function TaskCreate() {
+  const dispatch = useAppDispatch();
+  const nextId = useAppSelector(s => s.tasks.nextId); // affichage facultatif
 
-export default function TaskCreate({ nextId, onCreate }: TaskCreateProps) {
-  const [task, setTask] = useState<DraftTask>({
-    name: '',
-    priority: 0 as Priority,
-    status: 0 as Status,
-  });
+  const [name, setName] = useState('');
+  const [priority, setPriority] = useState<Priority>(0);
+  const [status, setStatus] = useState<Status>(0);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const lastSelRef = useRef<{priority: Priority, status: Status}>({
-    priority: 0 as Priority,
-    status: 0 as Status,
-  });
-
-  function resetTask() {
-    setTask({ name: '', ...lastSelRef.current });
+  function reset() {
+    setName('');
+    inputRef.current?.focus();
   }
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement> | React.KeyboardEvent<HTMLInputElement>) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const name = task.name.trim();
-    if (!name) return;
-
-    onCreate({
-      name,
-      priority: task.priority,
-      status: task.status,
-    });
-
-    lastSelRef.current = { priority: task.priority, status: task.status };
-    resetTask();
+    const n = name.trim();
+    if (!n) return;
+    dispatch(createTask({ name: n, priority, status }));
+    reset();
   }
 
   return (
-    <form className="TaskCreate" onSubmit={handleSubmit}>
+    <form className="taskcreate" onSubmit={handleSubmit}>
       <input
+        ref={inputRef}
         placeholder="Enter a task"
-        value={task.name}
-        onChange={e => setTask({ ...task, name: e.target.value })}
-        onKeyDown={e => { if (e.key === 'Enter') handleSubmit(e); }}
+        value={name}
+        onChange={e => setName(e.target.value)}
         autoFocus
       />
-      <select
-        value={task.priority}
-        onChange={e => setTask({ ...task, priority: Number(e.target.value) as Priority })}
-      >
-        {PRIORITY_VALUES.map(v => <option value={v.value}>{v.label}</option>)}
+      <select value={priority} onChange={e => setPriority(Number(e.target.value) as Priority)}>
+        {PRIORITY_VALUES.map(v => <option key={v.value} value={v.value}>{v.label}</option>)}
       </select>
-      <select
-        value={task.status}
-        onChange={e => setTask({ ...task, status: Number(e.target.value) as Status })}
-      >
-        {STATUS_VALUES.map(v => <option value={v.value}>{v.label}</option>)}
+      <select value={status} onChange={e => setStatus(Number(e.target.value) as Status)}>
+        {STATUS_VALUES.map(v => <option key={v.value} value={v.value}>{v.label}</option>)}
       </select>
-      <button type="submit" disabled={!task.name.trim()}>Create</button>
+      <button type="submit" disabled={!name.trim()}>Create</button>
+      <span style={{ marginLeft: 8, opacity: .6 }}>#{nextId}</span>
     </form>
   );
 }
