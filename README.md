@@ -37,6 +37,16 @@ Chaque version (React, Vue, Angular) implémente les fonctionnalités suivantes 
 - Typage : **TypeScript**  
 - Lint : **ESLint + Prettier**
 
+
+---
+
+### 🖖 **Vue**
+- Composition API, réactivité et composants monofichiers  
+- Gestion d’état avec **Pinia**  
+- Build : **Vite (vue-ts)**  
+- Typage : **TypeScript**  
+- Lint : **ESLint + Prettier**
+
 Dossier :  
 /fireflyfolio-todolist-web/vue/
 
