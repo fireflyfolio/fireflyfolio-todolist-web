@@ -37,6 +37,7 @@ Chaque version (React, Vue, Angular) implémente les fonctionnalités suivantes 
 - Typage : **TypeScript**  
 - Lint : **ESLint + Prettier**
 
+Dossier : /fireflyfolio-todolist-web/react/
 
 ---
 
@@ -47,8 +48,7 @@ Chaque version (React, Vue, Angular) implémente les fonctionnalités suivantes 
 - Typage : **TypeScript**  
 - Lint : **ESLint + Prettier**
 
-Dossier :  
-/fireflyfolio-todolist-web/vue/
+Dossier : /fireflyfolio-todolist-web/vue/
 
 ---
 
@@ -59,8 +59,7 @@ Dossier :
 - Typage : **TypeScript (strict mode)**  
 - Lint : **ESLint**
 
-Dossier :  
-/fireflyfolio-todolist-web/angular/
+Dossier : /fireflyfolio-todolist-web/angular/
 
 ---
 
