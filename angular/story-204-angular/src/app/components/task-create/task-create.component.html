@@ -1,0 +1,15 @@
+<div class="task-create">
+  <input placeholder="Enter a task" [formControl]="name" (keydown)="handleKeyDown($event)" autofocus />
+  <select [formControl]="priority">
+    <option [ngValue]="0">Low</option>
+    <option [ngValue]="1">Normal</option>
+    <option [ngValue]="2">High</option>
+    <option [ngValue]="3">Urgent</option>
+  </select>
+  <select [formControl]="status">
+    <option [ngValue]="0">Todo</option>
+    <option [ngValue]="1">Doing</option>
+    <option [ngValue]="2">Done</option>
+  </select>
+  <button (click)="handleCreateClick()">Create</button>
+</div>

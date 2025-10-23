@@ -1,0 +1,7 @@
+<div class="task-app">
+  <task-create [nextId]="nextId"
+    (onCreate)="handleCreateTask($event)" />
+  <task-list [tasks]="tasks"
+    (onUpdate)="handleUpdateTask($event)" (onDelete)="handleDeleteTask($event)"
+    (onSort)="handleSort($event)" (onFilter)="handleFilter($event)" />
+</div>

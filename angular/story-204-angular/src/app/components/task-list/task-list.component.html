@@ -1,0 +1,50 @@
+<div class="task-list">
+  <div class="body">
+    <table>
+      <thead>
+        <tr>
+          <th (click)="handleSortingClick('id')">ID</th>
+          <th (click)="handleSortingClick('name')">Task</th>
+          <th (click)="handleSortingClick('priority')">Priority</th>
+          <th (click)="handleSortingClick('status')">Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (t of tasks(); track t.id) {
+          <tr>
+            @if (t.id === editId) {
+              <td colspan="5" class="edit">
+                <task-edit [task]="t" (onUpdate)="handleUpdateClick($event)" (onCancel)="handleCancelClick()" />
+              </td>
+            } @else {
+              <td>{{ t.id }}</td>
+              <td>{{ t.name }}</td>
+              <td>{{ t.priority | priorityLabel }}</td>
+              <td>{{ t.status | statusLabel }}</td>
+              <td>
+                <button (click)="handleEditClick(t.id)">Edit</button>
+                <button (click)="handleDeleteClick(t.id)">Delete</button>
+              </td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <div class="footer">
+    <select [formControl]="priorityFilter" (change)="handleFilter()">
+      <option [ngValue]="-1">All Priorities</option>
+      <option [ngValue]="0">Low</option>
+      <option [ngValue]="1">Normal</option>
+      <option [ngValue]="2">High</option>
+      <option [ngValue]="3">Urgent</option>
+    </select>
+    <select [formControl]="statusFilter" (change)="handleFilter()">
+      <option [ngValue]="-1">All Statuses</option>
+      <option [ngValue]="0">Todo</option>
+      <option [ngValue]="1">Doing</option>
+      <option [ngValue]="2">Done</option>
+    </select>
+  </div>
+</div>

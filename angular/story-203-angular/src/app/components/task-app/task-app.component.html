@@ -1,0 +1,60 @@
+<div class="task-app">
+  <div class="head">
+    <input id="inputRef" class="task" placeholder="Enter a task" type="text" [formControl]="name"
+      (keydown)="onKeyDown($event)" autofocus />
+    <select [formControl]="priority">
+      <option [ngValue]="0">Low</option>
+      <option [ngValue]="1">Normal</option>
+      <option [ngValue]="2">High</option>
+      <option [ngValue]="3">Urgent</option>
+    </select>
+    <select [formControl]="status">
+      <option [ngValue]="0">Todo</option>
+      <option [ngValue]="1">Doing</option>
+      <option [ngValue]="2">Done</option>
+    </select>
+    <button (click)="onUpdateClick()">@if (task.id === null) { Create } @else { Update }</button>
+  </div>
+  <div class="body">
+    <table>
+      <thead>
+        <tr>
+          <th (click)="onSortingClick('id')">ID</th>
+          <th (click)="onSortingClick('name')">Task</th>
+          <th (click)="onSortingClick('priority')">Priority</th>
+          <th (click)="onSortingClick('status')">Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (t of tasks; track t.id) {
+          <tr>
+            <td>{{ t.id }}</td>
+            <td>{{ t.name }}</td>
+            <td>{{ t.priority | priorityLabel }}</td>
+            <td>{{ t.status | statusLabel }}</td>
+            <td>
+              <button (click)="onEditClick(t.id)">{{task.id === t.id ? 'Cancel' : 'Edit'}}</button>
+              <button (click)="onDeleteClick(t.id)">Delete</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <div class="footer">
+    <select [formControl]="priorityFilter" (change)="onPriorityFilter()">
+      <option [ngValue]="-1">All Priorities</option>
+      <option [ngValue]="0">Low</option>
+      <option [ngValue]="1">Normal</option>
+      <option [ngValue]="2">High</option>
+      <option [ngValue]="3">Urgent</option>
+    </select>
+    <select [formControl]="statusFilter" (change)="onStatusFilter()">
+      <option [ngValue]="-1">All Statuses</option>
+      <option [ngValue]="0">Todo</option>
+      <option [ngValue]="1">Doing</option>
+      <option [ngValue]="2">Done</option>
+    </select>
+  </div>
+</div>

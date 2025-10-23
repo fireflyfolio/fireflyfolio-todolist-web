@@ -1,0 +1,27 @@
+<div class="task-app">
+  <div class="head">
+    <input id="inputRef" class="task" placeholder="Enter a task" type="text" [formControl]="name"
+      (keydown)="onKeyDown($event)" autofocus />
+
+    @if (task().id === null) {
+      <button (click)="onCreateClick()">Create</button>
+    } @else {
+      <button (click)="onUpdateClick()">Update</button>
+    }
+  </div>
+  <div class="body">
+    <ol>
+      @for (t of tasks(); track t.id) {
+        <li>
+          <span class="task">{{ t.name }}</span>
+          @if (task().id === t.id) {
+            <button (click)="onCancelClick()">Cancel</button>
+          } @else {
+            <button (click)="onEditClick(t.id)">Edit</button>
+          }
+          <button (click)="onDeleteClick(t.id)">Delete</button>
+        </li>
+      }
+    </ol>
+  </div>
+</div>

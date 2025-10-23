@@ -1,0 +1,14 @@
+.task-app {
+  margin: 0;
+  padding: 20px;
+  border: solid 1px #ccc;
+}
+
+.head {
+  text-align: center;
+}
+
+.task {
+  display: inline-block;
+  width: 250px;
+}
