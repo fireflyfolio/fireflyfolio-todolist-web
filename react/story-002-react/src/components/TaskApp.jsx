@@ -3,25 +3,24 @@ import { useState, useRef } from 'react';
 import { getStatusLabel, getPriorityLabel, STATUS_VALUES, PRIORITY_VALUES } from '../helpers/labels';
 import './TaskApp.css';
 
-let allTasks = [];
-
 export default function TaskApp() {
   const [tasks, setTasks] = useState([]);
   const [task, setTask] = useState({ id: null, name: '', priority: 0, status: 0 });
   const [priorityFilter, setPriorityFilter] = useState(-1);
   const [statusFilter, setStatusFilter] = useState(-1);
   const nextIdRef = useRef(0);
+  const allTasksRef = useRef([]);
   const inputRef = useRef(null);
 
   function filterTasks(priority = -1, status = -1) {
     if (priority > -1 && status > -1)
-      return allTasks.filter(t => t.priority === priority && t.status === status);
+      return allTasksRef.current.filter(t => t.priority === priority && t.status === status);
     else if (priority > -1)
-      return allTasks.filter(t => t.priority === priority);
+      return allTasksRef.current.filter(t => t.priority === priority);
     else if (status > -1)
-      return allTasks.filter(t => t.status === status);
+      return allTasksRef.current.filter(t => t.status === status);
 
-    return [...allTasks];
+    return [...allTasksRef.current];
  }
 
   function resetTask() {
@@ -37,19 +36,19 @@ export default function TaskApp() {
     if (task.id === null) {
       const create = { ...task, id: nextIdRef.current++ };
       setTask(create);
-      allTasks.push(create);
+      allTasksRef.current.push(create);
    } else {
-      const index = allTasks.findIndex(t => t.id === task.id);
-      const update = allTasks[index];
+      const index = allTasksRef.current.findIndex(t => t.id === task.id);
+      const update = allTasksRef.current[index];
 
       update.name = task.name;
       update.priority = parseInt(task.priority);
       update.status = parseInt(task.status);
 
-      allTasks.splice(index, 1, update);
+      allTasksRef.current.splice(index, 1, update);
    }
 
-    setTasks([...allTasks]);
+    setTasks([...allTasksRef.current]);
     resetTask();
  }
 
@@ -64,8 +63,8 @@ export default function TaskApp() {
  }
 
   function handleDeleteClick(id) {
-    allTasks = allTasks.filter(t => t.id !== id);
-    setTasks([...allTasks]);
+    allTasksRef.current = allTasksRef.current.filter(t => t.id !== id);
+    setTasks([...allTasksRef.current]);
  }
 
   function handleSortingClick(property) {
