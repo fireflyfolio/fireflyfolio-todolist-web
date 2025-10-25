@@ -23,7 +23,6 @@ export interface TaskListProps {
 }
 
 export interface TaskCreateProps {
-  nextId: number;
   onCreate: (partial: PartialTaskInput) => void;
   priority?: Priority;
   status?: Status;

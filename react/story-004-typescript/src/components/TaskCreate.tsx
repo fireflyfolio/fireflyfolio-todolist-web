@@ -6,7 +6,7 @@ import './TaskCreate.css';
 
 type DraftTask = { name: string; priority: Priority, status: Status };
 
-export default function TaskCreate({ nextId, onCreate }: TaskCreateProps) {
+export default function TaskCreate({ onCreate }: TaskCreateProps) {
   const [task, setTask] = useState<DraftTask>({
     name: '',
     priority: 0 as Priority,

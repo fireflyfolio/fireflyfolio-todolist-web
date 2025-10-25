@@ -83,7 +83,7 @@ export default function TaskApp() {
 
  return (
     <div className="TaskApp">
-      <TaskCreate nextId={nextIdRef.current} onCreate={handleCreateTask} />
+      <TaskCreate onCreate={handleCreateTask} />
       <TaskList
         tasks={tasks}
         onUpdate={handleUpdateTask}
