@@ -3,7 +3,6 @@ import { useState, useRef } from 'react';
 import { getStatusLabel, getPriorityLabel, STATUS_VALUES, PRIORITY_VALUES } from '../helpers/labels';
 import './TaskApp.css';
 
-let nextId = 0;
 let allTasks = [];
 
 export default function TaskApp() {
@@ -11,6 +10,7 @@ export default function TaskApp() {
   const [task, setTask] = useState({ id: null, name: '', priority: 0, status: 0 });
   const [priorityFilter, setPriorityFilter] = useState(-1);
   const [statusFilter, setStatusFilter] = useState(-1);
+  const nextIdRef = useRef(0);
   const inputRef = useRef(null);
 
   function filterTasks(priority = -1, status = -1) {
@@ -35,7 +35,7 @@ export default function TaskApp() {
 
   function handleUpdateClick() {
     if (task.id === null) {
-      const create = { ...task, id: nextId++ };
+      const create = { ...task, id: nextIdRef.current++ };
       setTask(create);
       allTasks.push(create);
    } else {
