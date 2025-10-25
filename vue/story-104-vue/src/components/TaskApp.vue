@@ -1,84 +1,112 @@
+
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, watch } from 'vue'
+import TaskCreate from './TaskCreate.vue'
+import TaskList from './TaskList.vue'
 
-import TaskCreate from './TaskCreate.vue';
-import TaskList from './TaskList.vue';
+const STORAGE_KEY = 'taskapp:v3'
 
-let allTasks = [];
-let nextId = ref(0);
-let tasks = ref([]);
+// source of truth
+const allTasks = ref([])   // full dataset (unfiltered)
+const tasks = ref([])      // current view (filtered/sorted)
+const nextId = ref(0)
 
-function refreshAllTasks(t) {
-  allTasks = [...t];
+// sort state (handled in App to keep List dumb)
+const sortBy = ref('id')     // 'id' | 'name' | 'priority' | 'status'
+const sortDir = ref('asc')   // 'asc' | 'desc'
+
+function applySort(list){
+  const col = sortBy.value
+  const dir = sortDir.value === 'asc' ? 1 : -1
+  const arr = [...list]
+
+  arr.sort((a,b)=>{
+    if (col === 'name') return a.name.localeCompare(b.name) * dir
+    return (Number(a[col]) - Number(b[col])) * dir
+  })
+  
+  return arr
 }
 
+function refreshAllTasks(t) {
+  allTasks.value = [...t]
+}
+
+function hydrateFromStorage(){
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+
+    if (!raw) return
+    const parsed = JSON.parse(raw)
+
+    if (Array.isArray(parsed)) {
+      allTasks.value = parsed
+      tasks.value = applySort(parsed)
+      // reset nextId to max+1 if using numeric ids
+      const maxId = parsed.reduce((m,t)=> Math.max(m, Number.isFinite(+t.id)? +t.id : -1), -1)
+      nextId.value = isFinite(maxId) && maxId >= 0 ? maxId + 1 : 0
+    }
+  } catch {}
+}
+
+onMounted(()=>{
+  hydrateFromStorage()
+})
+
+watch(allTasks, (val)=>{
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(val)) } catch {}
+}, {deep:true})
+
+/* ---- Handlers from children ---- */
 function handleCreateTask(task) {
-  tasks.value = [...tasks.value, task];
-  nextId.value++;
-  refreshAllTasks(tasks.value);
+  const merged = [...allTasks.value, task]
+  refreshAllTasks(merged)
+  tasks.value = applySort(merged)
+  nextId.value++
 }
 
 function handleUpdateTask(task) {
-  allTasks = allTasks.map((t) => {
-    if (t.id === task.id) {
-      return task;
-    } else {
-      return t;
-    }
-  });
-
-  const _tasks = tasks.value.map(t => {
-    if (t.id === task.id) {
-      return task;
-    } else {
-      return t;
-    }
-  });
-
-  tasks.value = _tasks;
+  const updatedAll = allTasks.value.map(t => t.id === task.id ? task : t)
+  refreshAllTasks(updatedAll)
+  // also update current view
+  const updatedView = tasks.value.map(t => t.id === task.id ? task : t)
+  tasks.value = applySort(updatedView)
 }
 
 function handleDeleteTask(id) {
-  const _tasks = [...tasks.value.filter(t => t.id !== id)];
-  tasks.value = _tasks;
-  refreshAllTasks(_tasks);
+  const updated = allTasks.value.filter(t => t.id !== id)
+  refreshAllTasks(updated)
+  tasks.value = applySort(updated)
 }
 
-function handleSort(property) {
-  switch (property) {
-    case 'id':
-      tasks.value.sort((a, b) => a.id - b.id);
-      break;
-    case 'name':
-      tasks.value.sort((a, b) => a.name.localeCompare(b.name));
-      break;
-    case 'priority':
-      tasks.value.sort((a, b) => a.priority - b.priority);
-      break;
-    case 'status':
-      tasks.value.sort((a, b) => a.status - b.status);
-      break;
+function handleSort(column) {
+  if (sortBy.value === column) {
+    sortDir.value = sortDir.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortBy.value = column
+    sortDir.value = 'asc'
   }
+  tasks.value = applySort(tasks.value)
 }
 
 function handleFilter(priority = -1, status = -1) {
-  if (priority > -1 && status > -1) {
-    tasks.value = [...allTasks.filter(t => t.priority === priority && t.status === status)];
-  } else if (priority > -1) {
-    tasks.value = [...allTasks.filter(t => t.priority === priority)];
-  } else if (status > -1) {
-    tasks.value = [...allTasks.filter(t => t.status === status)];
-  } else {
-    tasks.value = [...allTasks];
-  }
+  let base = [...allTasks.value]
+  if (priority > -1) base = base.filter(t => Number(t.priority) === Number(priority))
+  if (status > -1) base = base.filter(t => Number(t.status) === Number(status))
+  tasks.value = applySort(base)
 }
 </script>
 
 <template>
   <div class="taskapp">
     <TaskCreate :nextId="nextId" @onCreate="handleCreateTask" />
-    <TaskList :tasks="tasks" @onUpdate="handleUpdateTask" @onDelete="handleDeleteTask"
-      @onSort="handleSort" @onFilter="handleFilter" />
+    <TaskList
+      :tasks="tasks"
+      @onUpdate="handleUpdateTask"
+      @onDelete="handleDeleteTask"
+      @onSort="handleSort"
+      @onFilter="handleFilter"
+    />
   </div>
 </template>
 

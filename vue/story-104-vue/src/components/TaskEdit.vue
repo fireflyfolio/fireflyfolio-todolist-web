@@ -1,45 +1,66 @@
+
 <script setup>
-import { ref } from 'vue';
-import { PRIORITY_VALUES, STATUS_VALUES } from '@/helpers/labels';
+import { reactive, useTemplateRef, onMounted, watch } from 'vue'
+import { PRIORITY_VALUES, STATUS_VALUES } from '@/helpers/labels'
 
-const props = defineProps(['tasks', 'id']);
-const emit = defineEmits(['onUpdate', 'onCancel']);
+const props = defineProps({
+  task: { type: Object, required: true } // {id,name,priority,status}
+})
+const emit = defineEmits(['onSave','onCancel'])
 
-const task = ref({ ...props.tasks.find(t => t.id === props.id) });
+const draft = reactive({
+  id: props.task.id,
+  name: props.task.name,
+  priority: props.task.priority,
+  status: props.task.status,
+})
 
-function handleKeyDown(e) {
-  if (e.keyCode === 13) handleUpdateClick();
-  if (e.keyCode === 27) emit('onCancel');
+watch(()=> props.task, (t)=>{
+  draft.id = t.id
+  draft.name = t.name
+  draft.priority = t.priority
+  draft.status = t.status
+}, {deep:true})
+
+const inputRef = useTemplateRef('inputRef')
+onMounted(()=> inputRef.value?.focus())
+
+function submit(){
+  const n = String(draft.name ?? '').trim()
+  if (!n) return
+  
+  emit('onSave', {
+    id: draft.id,
+    name: n,
+    priority: Number(draft.priority) || 0,
+    status: Number(draft.status) || 0,
+  })
 }
 
-function handleUpdateClick(e) {
-  emit('onUpdate', {
-    id: task.value.id,
-    name: task.value.name,
-    priority: task.value.priority,
-    status: task.value.status,
-  });
-}
+function cancel(){ emit('onCancel') }
+function onKeydown(e){ if (e.key === 'Escape') cancel() }
 </script>
 
 <template>
-  <div class="taskedit">
-    <input placeholder="Enter a task" v-model="task.name" @keydown="handleKeyDown" autofocus />
-    <select v-model="task.priority">
-      <option v-for="item in PRIORITY_VALUES" :value="item.value">{{ item.label }}</option>
+  <form class="taskedit" @submit.prevent="submit">
+    <input ref="inputRef" v-model="draft.name" class="task-input" @keydown="onKeydown" />
+    <select v-model.number="draft.priority" aria-label="Edit priority">
+      <option v-for="p in PRIORITY_VALUES" :key="p.value" :value="p.value">{{ p.label }}</option>
     </select>
-    <select v-model="task.status">
-      <option v-for="item in STATUS_VALUES" :value="item.value">{{ item.label }}</option>
-    </select>      
-    <button @click="handleUpdateClick">Update</button>
-    <button @click="$emit('onCancel')">Cancel</button>
-  </div>
+    <select v-model.number="draft.status" aria-label="Edit status">
+      <option v-for="s in STATUS_VALUES" :key="s.value" :value="s.value">{{ s.label }}</option>
+    </select>
+    <button type="submit">Save</button>
+    <button type="button" @click="cancel">Cancel</button>
+  </form>
 </template>
 
 <style scoped>
 .taskedit {
-  margin-bottom: 16px;
-  padding: 20px;
-  border: solid 1px #ccc;
+  display: grid;
+  grid-template-columns: 1fr auto auto auto auto;
+  gap: 8px;
+  align-items: center;
 }
+.task-input { width: 100%; padding: 6px 8px; }
 </style>

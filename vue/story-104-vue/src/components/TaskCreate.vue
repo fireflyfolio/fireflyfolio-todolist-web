@@ -1,48 +1,74 @@
+
 <script setup>
-import { ref } from 'vue';
-import { PRIORITY_VALUES, STATUS_VALUES } from '@/helpers/labels';
+import { ref, useTemplateRef, onMounted } from 'vue'
+import { PRIORITY_VALUES, STATUS_VALUES } from '@/helpers/labels'
 
-const props = defineProps(['nextId']);
-const emit = defineEmits(['onCreate']);
+const props = defineProps({
+  nextId: { type: Number, required: true },
+})
 
-const defaultTask = { id: null, name: '', priority: 0, status: 0 };
-const task = ref(defaultTask);
+const emit = defineEmits(['onCreate'])
 
-function resetTask() {
-  defaultTask.name = '';
-  defaultTask.priority = task.value.priority;
-  defaultTask.status = task.value.status;
-  task.value = { ...defaultTask };
+const name = ref('')
+const priority = ref(0)
+const status = ref(0)
+
+const inputRef = useTemplateRef('inputRef')
+
+onMounted(()=> inputRef.value?.focus())
+
+function reset(){
+  name.value = ''
+  priority.value = 0
+  status.value = 0
 }
 
-function handleKeyDown(e) {
-  if (e.key === 'Enter') handleCreateClick();
+function onKeydown(e){
+  if (e.key === 'Escape') reset()
 }
 
-function handleCreateClick(e) {
-  emit('onCreate', { ...task.value, id: props.nextId });
-  resetTask();
+function submit(){
+  const n = name.value.trim()
+  if (!n) return
+  emit('onCreate', {
+    id: props.nextId,
+    name: n,
+    priority: Number(priority.value) || 0,
+    status: Number(status.value) || 0,
+  })
+  reset()
+  queueMicrotask(()=> inputRef.value?.focus())
 }
 </script>
 
 <template>
-  <div class="taskcreate">
-    <input placeholder="Enter a task" v-model="task.name" @keydown="handleKeyDown" autofocus />
-    <select v-model="task.priority">
-      <option v-for="item in PRIORITY_VALUES" :value="item.value">{{ item.label }}</option>
+  <form class="taskcreate" @submit.prevent="submit">
+    <input
+      ref="inputRef"
+      class="task-input"
+      placeholder="Enter a task"
+      v-model="name"
+      @keydown="onKeydown"
+      autofocus
+    />
+    <select v-model.number="priority" aria-label="Select priority">
+      <option v-for="p in PRIORITY_VALUES" :key="p.value" :value="p.value">{{ p.label }}</option>
     </select>
-    <select v-model="task.status">
-      <option v-for="item in STATUS_VALUES" :value="item.value">{{ item.label }}</option>
-    </select>      
-    <button @click="handleCreateClick">Create</button>
-  </div>
+    <select v-model.number="status" aria-label="Select status">
+      <option v-for="s in STATUS_VALUES" :key="s.value" :value="s.value">{{ s.label }}</option>
+    </select>
+    <button type="submit" :disabled="!name.trim()">Create</button>
+    <button type="button" @click="reset">Reset</button>
+  </form>
 </template>
 
 <style scoped>
 .taskcreate {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto auto;
+  gap: 8px;
+  align-items: center;
   margin-bottom: 16px;
-  padding: 20px;
-  border: solid 1px #ccc;
-  text-align: center;
 }
+.task-input { max-width: 320px; width: 100%; padding: 8px 10px; }
 </style>
