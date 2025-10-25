@@ -3,12 +3,11 @@ import { useState, useRef } from 'react';
 
 import './TaskApp.css';
 
-let nextId = 0;
-
 export default function TaskApp() {
   const [tasks, setTasks] = useState([]);
   const [task, setTask] = useState(null);
   const [name, setName] = useState('');
+  const nextIdRef = useRef(0);
   const inputRef = useRef(null);
 
   function handleKeyDown(e) {
@@ -21,7 +20,7 @@ export default function TaskApp() {
 
     if (task === null) {
       const newTask = {
-        id: nextId++,
+        id: nextIdRef.current++,
         name: name.trim(),
         status: 'Todo',
         priority: 'Normal',
